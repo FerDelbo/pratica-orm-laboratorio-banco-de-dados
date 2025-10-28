@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+# Configurações para carregar variáveis de ambiente
+import os
+from dotenv import load_dotenv
+# Carregando as variáveis de ambiente do arquivo .env
+load_dotenv()
+senha_postgres = os.getenv("SENHA_POSTGRES")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -72,17 +78,28 @@ WSGI_APPLICATION = 'orm_django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+## Utilizar em sala
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "postgres",
+#         "USER": "postgres@postgres.com",
+#         "PASSWORD": "postgres",
+#         "HOST": "127.0.0.1",
+#         "PORT": "5432",
+#     }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "postgres",
-        "USER": "postgres@postgres.com",
-        "PASSWORD": "postgres",
+        "USER": "postgres",
+        "PASSWORD": senha_postgres,
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
