@@ -37,13 +37,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'musica.apps.MusicaConfig',
+    # 'musica.apps.MusicaConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'musica',
 ]
 
 MIDDLEWARE = [
