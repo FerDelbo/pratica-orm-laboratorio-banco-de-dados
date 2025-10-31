@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'musica.apps.MusicaConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +83,7 @@ WSGI_APPLICATION = 'orm_django.wsgi.application'
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
+#         "NAME": "postgres", # Nome doo database
 #         "USER": "postgres@postgres.com",
 #         "PASSWORD": "postgres",
 #         "HOST": "127.0.0.1",
@@ -93,7 +94,7 @@ WSGI_APPLICATION = 'orm_django.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
+        "NAME": "projeto",
         "USER": "postgres",
         "PASSWORD": senha_postgres,
         "HOST": "127.0.0.1",
