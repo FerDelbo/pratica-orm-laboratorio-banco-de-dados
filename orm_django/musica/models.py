@@ -49,15 +49,20 @@ class Musica(models.Model):
 class MusicaPlaylist(models.Model):
     pk = models.CompositePrimaryKey("musica_id", "playlist_id", "usuario_id")
     musica_id = models.ForeignKey('Musica', on_delete=models.CASCADE, null=False)
-    playlist_id = models.IntegerField(null=False, unique=True)
-    usuario_id = models.IntegerField(null=False, unique=True)
+    playlist_id = models.IntegerField(null=False)
+    usuario_id = models.IntegerField(null=False)
     playlist = models.ForeignObject(
         'Playlist',
         on_delete=models.CASCADE,
         from_fields=['playlist_id', 'usuario_id'],
         to_fields=['playlist_id', 'usuario_id']
     )
-    ordem_na_playlist = models.IntegerField(null=False, unique=True)
+    ordem_na_playlist = models.IntegerField(null=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['ordem_na_playlist', 'playlist_id', 'usuario_id'], name='pk_musica_playlist_usuario')
+        ]
     
     def __str__(self):
         return f"Música: {self.musica.titulo} na Playlist: {self.playlist.nome}"

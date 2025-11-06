@@ -7,8 +7,105 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'orm_django.settings')
 django.setup()
 
-
 from musica.models import Musica, Artista, Usuario, Playlist, MusicaPlaylist
+
+# Popular banco de dados
+queen = Artista.objects.create(nome='Queen', nacionalidade='Britânica') #1
+queen.save()
+led_zeppelin = Artista.objects.create(nome='Led Zeppelin', nacionalidade='Britânica') # 2
+led_zeppelin.save()
+acdc = Artista.objects.create(nome='AC/DC', nacionalidade='Australiana') # 3
+acdc.save()
+banda_x = Artista.objects.create(nome='Banda X (Pop)', nacionalidade='Brasileira') # 3
+banda_x.save()
+
+pablo = Usuario.objects.create(username='Pablo', email='pablo@aluno.com') # 1
+pablo.save()
+josue = Usuario.objects.create(username='Josue', email='josue@aluno.com') # 2
+josue.save()
+alexandre = Usuario.objects.create(username='Alexandre', email='alexandre@aluno.com') # 3
+alexandre.save()
+
+# artista id =1 -> queen
+bohemian = Musica.objects.create(titulo='Bohemian Rhapsody', duracao_segundos=354, artista=queen)
+bohemian.save()
+we_will_rock_you = Musica.objects.create(titulo='We Will Rock You', duracao_segundos=160, artista=queen)
+we_will_rock_you.save()
+#artista_id=2 -> artista=led_zeppelin
+stairway = Musica.objects.create(titulo='Stairway to Heaven', duracao_segundos=482, artista=led_zeppelin)
+stairway.save()
+#artista_id=3 -> artista=acdc
+back_in_black = Musica.objects.create(titulo='Back In Black', duracao_segundos=255, artista=acdc)
+back_in_black.save()
+thunderstruck = Musica.objects.create(titulo='Thunderstruck', duracao_segundos=292, artista=acdc)
+thunderstruck.save()
+
+#artista_id=4 -> artista=banda_x
+pop_br = Musica.objects.create(titulo='Musica Pop Brasileira', duracao_segundos=180, artista=banda_x)
+pop_br.save()
+
+pablo = Usuario.objects.get(id=1)
+josue = Usuario.objects.get(id=2)
+
+bohemian = Musica.objects.get(id=1)
+stairway = Musica.objects.get(id=2)
+back_in_black = Musica.objects.get(id=3)
+we_will_rock_you = Musica.objects.get(id=4)
+
+thunderstruck = Musica.objects.get(id=6)
+
+
+p1_pablo = Playlist.objects.create(playlist_id=1, usuario_id=pablo, nome='Rock do Pablo')
+p1_pablo.save()
+p1_josue = Playlist.objects.create(playlist_id=2, usuario_id=josue, nome='Baladas do Josue')
+p1_josue.save()
+p2_pablo = Playlist.objects.create(playlist_id=3, usuario_id=pablo, nome='Heavy Riffs')
+p2_pablo.save()
+
+mp1 = MusicaPlaylist.objects.create(
+    musica_id=bohemian,       # musica_id 1
+    playlist_id=1,
+    usuario_id=pablo.id,   # usuario_id 1
+    ordem_na_playlist=1
+)
+mp1.save()
+mp2 = MusicaPlaylist.objects.create(
+    musica_id=back_in_black,  # musica_id 3
+    playlist_id=1,
+    usuario_id=pablo.id,
+    ordem_na_playlist=2
+)
+mp2.save()
+mp3 = MusicaPlaylist.objects.create(
+    musica_id=we_will_rock_you, # musica_id 4
+    playlist_id=1,
+    usuario_id=pablo.id,
+    ordem_na_playlist=3
+)
+mp3.save()
+# Playlist (2, 2): 'Baladas do Josue'
+mp4 = MusicaPlaylist.objects.create(
+    musica_id=stairway,        # musica_id 2
+    playlist_id=2,
+    usuario_id=josue.id,   # usuario_id 2
+    ordem_na_playlist=1
+)
+mp4.save()
+# Playlist (3, 1): 'Heavy Riffs'
+mp5 = MusicaPlaylist.objects.create(
+    musica_id=back_in_black,  # musica_id 3
+    playlist_id=3,
+    usuario_id=pablo.id,   # usuario_id 1
+    ordem_na_playlist=1
+)
+mp5.save()
+mp6 = MusicaPlaylist.objects.create(
+    musica_id=thunderstruck,  # musica_id 6
+    playlist_id=3,
+    usuario_id=pablo.id,
+    ordem_na_playlist=2
+)
+mp6.save()
 
 #1 CRUD artista e musica
 print("===CRUD Artista===")
