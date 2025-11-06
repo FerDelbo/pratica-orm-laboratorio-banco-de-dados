@@ -1,5 +1,6 @@
 asgiref==3.10.0
 Django==5.2.7
+django-composite-foreignkey==1.1.0
 psycopg2-binary==2.9.11
 python-dotenv==1.1.1
 sqlparse==0.5.3

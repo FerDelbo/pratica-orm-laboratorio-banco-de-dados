@@ -9,30 +9,39 @@ django.setup()
 
 
 from musica.models import Musica, Artista, Usuario, Playlist, MusicaPlaylist
+
 #1 CRUD artista e musica
 print("===CRUD Artista===")
 print("===CREATE===")
 a1 = Artista.objects.create(nome="Imagine Dragons", nacionalidade="EUA")
 a1.save() # Salvar no banco de dados
+
 print("===READ===")
 artista_id = Artista.objects.get(id=5) # Pegar o "Imagine Dragons"
 print("Artista:", artista_id.nome)
+
 print("===UPDATE===")
 a1.nacionalidade = "Estadunidense"
-a1.save() # Atualizar no banco de dados
-# print("===DELETE===")
-# a1.delete() # Deletar do banco de dados
-print("===CRUD Musica===")
+a1.save() 
+
+print("===DELETE===")
+# a1.delete()
+
+print("\n===CRUD Musica===\n")
+
 print("===CREATE===")
 m1 = Musica.objects.create(titulo="Believer", duracao_segundos=204, artista=artista_id)
 m1.save() # Salvar no banco de dados
+
 print("===READ===")
 musica_id = Musica.objects.get(id=7) # Pegar a "Believer"
 print("Música:", musica_id.titulo)
+
 print("===UPDATE===")
 m1.duracao_segundos = 210
 m1.save() # Atualizar no banco de dados
-# print("===DELETE===")
+
+print("===DELETE===")
 # m1.delete() # Deletar do banco de dados
 
 # 2 Criar usuario e playlist
