@@ -5,25 +5,17 @@ class Artista(models.Model):
     nome = models.CharField(max_length=100, null=False, unique=True)
     nacionalidade = models.CharField(max_length=100, default="Desconhecida")
 
-    def __str__(self):
-        return self.nome
-
 class Usuario(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, unique=True)
     email = models.CharField(max_length=255, unique=True)
 
-    def __str__(self):
-        return self.username
 
 class Playlist(models.Model):
     playlist_id = models.AutoField(primary_key=True)
-    usuario_id = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='usuario_id')
+    usuario_id = models.ForeignKey('Usuario', on_delete=models.CASCADE, db_column='usuario_id', null=False)
     nome = models.CharField(max_length=100)
     data_criacao = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Playlist: {self.nome} do usuario: {self.usuario.username}"
 
     class Meta:
         constraints = [
@@ -41,9 +33,6 @@ class Musica(models.Model):
         constraints =[
             models.CheckConstraint(check=models.Q(duracao_segundos__gt=0), name='duracao_positiva')
         ]
-
-    def __str__(self):
-        return f"{self.titulo} por {self.artista.nome}"
 
     
 class MusicaPlaylist(models.Model):
@@ -63,6 +52,3 @@ class MusicaPlaylist(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['ordem_na_playlist', 'playlist_id', 'usuario_id'], name='pk_musica_playlist_usuario')
         ]
-    
-    def __str__(self):
-        return f"Música: {self.musica.titulo} na Playlist: {self.playlist.nome}"
