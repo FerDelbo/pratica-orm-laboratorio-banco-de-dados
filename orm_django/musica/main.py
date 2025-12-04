@@ -38,7 +38,7 @@ from musica.models import Musica, Artista, Usuario, Playlist, MusicaPlaylist
 # back_in_black = Musica.objects.create(titulo='Back In Black', duracao_segundos=255, artista=acdc)
 # back_in_black.save()
 # thunderstruck = Musica.objects.create(titulo='Thunderstruck', duracao_segundos=292, artista=acdc)
-# thunderstruck.save()
+# thunderstruck.save()('usuario', models.ForeignKey(db_column='usuario_id', on_delete=django.db.models.deletion.CASCADE, to='musica.usuario')),
 
 # #artista_id=4 -> artista=banda_x
 # pop_br = Musica.objects.create(titulo='Musica Pop Brasileira', duracao_segundos=180, artista=banda_x)
