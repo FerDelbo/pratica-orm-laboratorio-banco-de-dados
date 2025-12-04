@@ -10,9 +10,6 @@ django.setup()
 
 from musica.models import Musica, Artista, Usuario, Playlist, MusicaPlaylist
 
-# m = Musica.objects.all()
-# for musica in m:
-#     print(f'{musica.id} - {musica.titulo} - {musica.duracao_segundos} seg - Artista: {musica.artista.nome}')
 
 # função para listar todas as Playlists de um USUARIO específico, usando o username como filtro 
 # Deve retorno Nome da playlist e data de criação
@@ -21,7 +18,7 @@ def listar_playlists_usuario(username):
     playlists = Playlist.objects.filter(usuario_id=usuario)
     for playlist in playlists:
         print(f'Nome da Playlist: {playlist.nome}, Data de Criação: {playlist.data_criacao}')
-    return playlists
+    return playlists.query
 
 print("==Teste 1==")
 print(listar_playlists_usuario('Pablo'))
@@ -36,10 +33,11 @@ def listar_musicas_playlists_usuario_artista(username, nome_artista):
     musicas = Musica.objects.filter(musicaplaylist__playlist_id__in=playlists, artista=artista).distinct()
     for musica in musicas:
         print(f'Título da Música: {musica.titulo}, Artista: {musica.artista.nome}')
-    return musicas
+    return musicas.query
 
 print("==Teste 2==")
 print(listar_musicas_playlists_usuario_artista('Josue', 'Queen'))
+
 # Liste o nome de todas as Playlists e o número total de Músicas que cada uma contém. 
 # A listagem deve ser ordenada da Playlist mais longa para a mais curta.
 
@@ -48,7 +46,7 @@ def listar_playlists_com_numero_musicas():
     playlists = Playlist.objects.annotate(num_musicas=Count('musicaplaylist__musica_id')).order_by('-num_musicas')
     for playlist in playlists:
         print(f'Nome da Playlist: {playlist.nome}, Número de Músicas: {playlist.num_musicas}')
-    return playlists
+    return playlists.query
 
 print("==Teste 3==")
 print(listar_playlists_com_numero_musicas())
@@ -59,7 +57,7 @@ def listar_artistas_sem_musicas_em_playlists():
     artistas = Artista.objects.exclude(musica__musicaplaylist__isnull=False)
     for artista in artistas:
         print(f'Artista: {artista.nome}')
-    return artistas
+    return artistas.query
 
 print("==Teste 4==")
 print(listar_artistas_sem_musicas_em_playlists())
@@ -69,7 +67,9 @@ print(listar_artistas_sem_musicas_em_playlists())
 #  carregue (fetch) automaticamente todos os detalhes do Artista relacionado.
 #  (Foco em Eager Loading ou Fetching Join).
 def buscar_musica_com_artista(musica_id):
-    musica = Musica.objects.select_related('artista').get(id=musica_id)
+    musica = Musica.objects.select_related('artista').filter(id=musica_id)
+    print (f'Consulta SQL Executada: {musica.query}')
+    musica = musica.first() 
     # O select_related acima evita o porblema N+1 pois busca as Musicas com o artista direto
     print(f'Título da Música: {musica.titulo}, Artista: {musica.artista.nome}, Nacionalidade: {musica.artista.nacionalidade}')
     return musica
@@ -89,6 +89,8 @@ def listar_tempo_total_playlists():
         tempo_total=Sum('musicaplaylist__musica_id__duracao_segundos')
     )
     
+    print("Consulta SQL Executada:", qs.query)
+
     resultados = []
     for p in qs:
         tempo = p.tempo_total or 0
@@ -113,7 +115,7 @@ def listar_musicas_abaixo_media_artista():
     musicas = Musica.objects.annotate(media_duracao_artista=Subquery(subquery)).filter(duracao_segundos__lt=F('media_duracao_artista'))
     for musica in musicas:
         print(f'Título da Música: {musica.titulo}, Duração: {musica.duracao_segundos}, Média do Artista: {musica.media_duracao_artista}')
-    return musicas
+    return musicas.query
 
 print("==Teste 7==")
 print(listar_musicas_abaixo_media_artista())
@@ -126,7 +128,7 @@ def listar_musicas_na_playlist(nome_playlist):
     musicas_playlist = MusicaPlaylist.objects.filter(playlist=playlist).select_related('musica_id').order_by('ordem_na_playlist')
     for mp in musicas_playlist:
         print(f'Ordem: {mp.ordem_na_playlist}, Título da Música: {mp.musica_id.titulo}')
-    return musicas_playlist
+    return musicas_playlist.query
 
 print("==Teste 8==")
 # print(listar_musicas_na_playlist('Rock do Pablo'))
@@ -137,6 +139,7 @@ print(listar_musicas_na_playlist('Baladas do Josue'))
 def encontrar_dono_playlist_por_musica(titulo_musica):
     musica = Musica.objects.get(titulo=titulo_musica)
     musicas_playlist = MusicaPlaylist.objects.filter(musica_id=musica).select_related('playlist__usuario_id')
+    print('Consulta SQL Executada:', musicas_playlist.query)
     donos = set()
     for mp in musicas_playlist:
         dono = mp.playlist.usuario_id
@@ -147,7 +150,7 @@ def encontrar_dono_playlist_por_musica(titulo_musica):
 print("==Teste 9==")
 # Musica Pop Brasileira
 # encontrar_dono_playlist_por_musica('Bohemian Rhapsody')
-encontrar_dono_playlist_por_musica('Musica Pop Brasileira')
+print(encontrar_dono_playlist_por_musica('Musica Pop Brasileira'))
 
 # Liste todos os Artistas e seu ranking baseado no número de Playlists
 #  em que suas músicas estão presentes (o Artista com músicas na maior
@@ -158,12 +161,13 @@ def listar_ranking_artistas_por_playlists():
     artistas = Artista.objects.annotate(num_playlists=Count('musica__musicaplaylist__playlist_id', distinct=True)).order_by('-num_playlists')
     for artista in artistas:
         print(f'Artista: {artista.nome}, Número de Playlists: {artista.num_playlists}')
-    return artistas
+    return artistas.query
 
 print("==Teste 10==")
 print(listar_ranking_artistas_por_playlists())
 
-
+# Liste todas as Músicas do Artista 'Led Zeppelin' 
+# cuja duração é maior que a duração da música mais longa do Artista 'Queen'.
 
 def listar_musicas_led_mais_longas_que_queen_max():
     from django.db.models import Max, Subquery
@@ -176,6 +180,7 @@ def listar_musicas_led_mais_longas_que_queen_max():
         .values('max_dur')
     )
     qs = Musica.objects.filter(artista__nome='Led Zeppelin', duracao_segundos__gt=Subquery(subq))
+    print("Consulta SQL Executada:", qs.query)
     resultados = []
     for m in qs:
         print(f'Título: {m.titulo}, Duração: {m.duracao_segundos}, Artista: {m.artista.nome}')
@@ -184,50 +189,11 @@ def listar_musicas_led_mais_longas_que_queen_max():
 
 
 print("==Teste 11==")
-listar_musicas_led_mais_longas_que_queen_max()
+print(listar_musicas_led_mais_longas_que_queen_max())
 
-#  Implemente uma função que mova uma MUSICA de uma PLAYLIST
-#  para outra PLAYLIST (ambas do mesmo USUARIO),
-#  garantindo que o processo seja Atômico (ou tudo acontece ou nada acontece).
-
-# def mover_musica_entre_playlists(usuario_id, musica_id, playlist_origem_id, playlist_destino_id):
-#     from django.db import transaction
-
-#     try:
-#         with transaction.atomic():
-#             mp_origem = MusicaPlaylist.objects.get(
-#                 musica_id=musica_id,
-#                 playlist_id=playlist_origem_id,
-#                 usuario_id=usuario_id
-#             )
-#             # Verifica se a música já está na playlist de destino
-#             if MusicaPlaylist.objects.filter(
-#                 musica_id=musica_id,
-#                 playlist_id=playlist_destino_id,
-#                 usuario_id=usuario_id
-#             ).exists():
-#                 print("A música já está na playlist de destino.")
-#                 return
-
-#             # Remove da playlist de origem
-#             mp_origem.delete()
-
-#             # Adiciona à playlist de destino
-#             ordem_destino = MusicaPlaylist.objects.filter(
-#                 playlist_id=playlist_destino_id,
-#                 usuario_id=usuario_id
-#             ).count() + 1
-
-#             mp_destino = MusicaPlaylist.objects.create(
-#                 musica_id=musica_id,
-#                 playlist_id=playlist_destino_id,
-#                 usuario_id=usuario_id,
-#                 ordem_na_playlist=ordem_destino
-#             )
-#             mp_destino.save()
-#             print("Música movida com sucesso.")
-#     except Exception as e:
-#         print(f"Erro ao mover música: {e}")
+# Implemente uma função que mova uma MUSICA de uma PLAYLIST para outra PLAYLIST
+# (ambas do mesmo USUARIO), 
+# garantindo que o processo seja Atômico (ou tudo acontece ou nada acontece).
 
 def mover_musica_entre_playlists(usuario_id, musica_id, playlist_origem_id, playlist_destino_id):
     from django.db import transaction
@@ -271,21 +237,20 @@ def mover_musica_entre_playlists(usuario_id, musica_id, playlist_origem_id, play
                 ordem_na_playlist=ordem_destino
             )
             print("Música movida com sucesso.")
+            return mp_destino.query
     except Musica.DoesNotExist:
         print("Música não encontrada.")
     except MusicaPlaylist.DoesNotExist:
         print("Registro da música na playlist de origem não encontrado.")
     except Exception as e:
         print(f"Erro ao mover música: {e}")
-# ...existing code...
+
 
 print("==Teste 12==")
 
-mover_musica_entre_playlists(
+print(mover_musica_entre_playlists(
     usuario_id=1, # Pablo
     musica_id=1, # Bohemian Rhapsody
     playlist_origem_id=1, # Rock do Pablo
     playlist_destino_id=3 # Heavy Riffs
-)
-
-
+))
